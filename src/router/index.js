@@ -5,6 +5,6 @@ Vue.use(VueRouter);
 
 export default new VueRouter({
   routes: [
-    {path: "/", component:()=>import("@/view/HelloWorld")}
+    {path: "/", component:()=>import("@/view/love")}
   ]
 })

@@ -153,9 +153,10 @@ export default {
           ]
         ],
         bloom: {
-          num: 700,
+          num: 999,
           width: 1080,
-          height: 650
+          height: 650,
+          scale: 1.5
         },
         footer: {
           width: 1200,

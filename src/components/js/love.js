@@ -3,16 +3,16 @@ export function random(min, max) {
 }
 
 export function bezier(cp, t) {
-  var p1 = cp[0].mul((1 - t) * (1 - t));
-  var p2 = cp[1].mul(2 * t * (1 - t));
-  var p3 = cp[2].mul(t * t);
+  let p1 = cp[0].mul((1 - t) * (1 - t));
+  let p2 = cp[1].mul(2 * t * (1 - t));
+  let p3 = cp[2].mul(t * t);
   return p1.add(p2).add(p3);
 }
 
 function inheart(x, y, r) {
   // x^2+(y-(x^2)^(1/3))^2 = 1
   // http://www.wolframalpha.com/input/?i=x%5E2%2B%28y-%28x%5E2%29%5E%281%2F3%29%29%5E2+%3D+1
-  var z =
+  let z =
     ((x / r) * (x / r) + (y / r) * (y / r) - 1) *
       ((x / r) * (x / r) + (y / r) * (y / r) - 1) *
       ((x / r) * (x / r) + (y / r) * (y / r) - 1) -
@@ -54,15 +54,16 @@ Point.prototype = {
   }
 };
 
+// 心形❤️
 let Heart = function() {
   // x = 16 sin^3 t
   // y = 13 cos t - 5 cos 2t - 2 cos 3t - cos 4t
   // http://www.wolframalpha.com/input/?i=x+%3D+16+sin%5E3+t%2C+y+%3D+(13+cos+t+-+5+cos+2t+-+2+cos+3t+-+cos+4t)
-  var points = [],
+  let points = [],
     x,
     y,
     t;
-  for (var i = 10; i < 30; i += 0.2) {
+  for (let i = 10; i < 30; i += 0.2) {
     t = i / Math.PI;
     x = 16 * Math.pow(Math.sin(t), 3);
     y =
@@ -81,24 +82,50 @@ Heart.prototype = {
   }
 };
 
+//五角星⭐️
+let Star = function() {
+  // x=2cos(3t)+5cos(2t),
+  // y=2sin(3t)-5sin(2t)
+  // https://www.wolframalpha.com/input/?i=x%3D2cos%283t%29%2B5cos%282t%29%2Cy%3D2sin%283t%29-5sin%282t%29
+  let points = [],
+    x,
+    y,
+    t;
+  for (let i = 0; i < 99; i += 0.2) {
+    t = i / (Math.PI * 2);
+    x = 2 * Math.cos(3 * t) + 5 * Math.cos(2 * t);
+    y = 2 * Math.sin(3 * t) - 5 * Math.sin(2 * t);
+    points.push(new Point(x, y));
+  }
+  this.points = points;
+  this.length = points.length;
+};
+Star.prototype = {
+  get: function(i, scale) {
+    return this.points[i].mul(scale || 1);
+  }
+};
+
 let Seed = function(tree, point, scales, colors) {
   this.tree = tree;
 
-  var scale = scales || 1;
-  var color = colors || "#FF0000";
+  let scale = scales || 1;
+  let color = colors || "#FF0000";
 
   this.heart = {
     point: point,
     scale: scale,
     color: color,
-    figure: new Heart()
+    // figure: new Heart()
+    figure: new Star()
   };
 
   this.cirle = {
     point: point,
     scale: scale,
     color: color,
-    radius: 5
+    // radius: 5,
+    radius: 3
   };
 };
 Seed.prototype = {
@@ -130,9 +157,9 @@ Seed.prototype = {
     this.setHeartScale(scale);
   },
   drawHeart: function() {
-    var ctx = this.tree.ctx,
+    let ctx = this.tree.ctx,
       heart = this.heart;
-    var point = heart.point,
+    let point = heart.point,
       color = heart.color,
       scale = heart.scale;
     ctx.save();
@@ -140,8 +167,8 @@ Seed.prototype = {
     ctx.translate(point.x, point.y);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    for (var i = 0; i < heart.figure.length; i++) {
-      var p = heart.figure.get(i, scale);
+    for (let i = 0; i < heart.figure.length; i++) {
+      let p = heart.figure.get(i, scale);
       ctx.lineTo(p.x, -p.y);
     }
     ctx.closePath();
@@ -149,9 +176,9 @@ Seed.prototype = {
     ctx.restore();
   },
   drawCirle: function() {
-    var ctx = this.tree.ctx,
+    let ctx = this.tree.ctx,
       cirle = this.cirle;
-    var point = cirle.point,
+    let point = cirle.point,
       color = cirle.color,
       scale = cirle.scale,
       radius = cirle.radius;
@@ -167,9 +194,9 @@ Seed.prototype = {
     ctx.restore();
   },
   drawText: function() {
-    var ctx = this.tree.ctx,
+    let ctx = this.tree.ctx,
       heart = this.heart;
-    var point = heart.point,
+    let point = heart.point,
       color = heart.color,
       scale = heart.scale;
     ctx.save();
@@ -189,18 +216,18 @@ Seed.prototype = {
     ctx.restore();
   },
   clear: function() {
-    var ctx = this.tree.ctx,
+    let ctx = this.tree.ctx,
       cirle = this.cirle;
-    var point = cirle.point,
+    let point = cirle.point,
       scale = cirle.scale,
       radius = 26;
     let h;
-    var w = (h = radius * scale);
+    let w = (h = radius * scale);
     ctx.clearRect(point.x - w, point.y - h, 4 * w, 4 * h);
   },
   hover: function(x, y) {
-    var ctx = this.tree.ctx;
-    var pixel = ctx.getImageData(x, y, 1, 1);
+    let ctx = this.tree.ctx;
+    let pixel = ctx.getImageData(x, y, 1, 1);
     return pixel.data[3] === 255;
   }
 };
@@ -215,9 +242,9 @@ let Footer = function(tree, width, height, speed) {
 };
 Footer.prototype = {
   draw: function() {
-    var ctx = this.tree.ctx,
+    let ctx = this.tree.ctx,
       point = this.point;
-    var len = this.length / 2;
+    let len = this.length / 2;
 
     ctx.save();
     ctx.strokeStyle = "rgb(35, 31, 32)";
@@ -254,41 +281,55 @@ export let Tree = function(canvas, width, height, opt) {
 };
 Tree.prototype = {
   initSeed: function() {
-    var seed = this.opt.seed || {};
-    var x = seed.x || this.width / 2;
-    var y = seed.y || this.height / 2;
-    var point = new Point(x, y);
-    var color = seed.color || "#FF0000";
-    var scale = seed.scale || 1;
+    let seed = this.opt.seed || {};
+    let x = seed.x || this.width / 2;
+    let y = seed.y || this.height / 2;
+    let point = new Point(x, y);
+    let color = seed.color || "#FF0000";
+    let scale = seed.scale || 1;
 
     this.seed = new Seed(this, point, scale, color);
   },
 
   initFooter: function() {
-    var footer = this.opt.footer || {};
-    var width = footer.width || this.width;
-    var height = footer.height || 5;
-    var speed = footer.speed || 2;
+    let footer = this.opt.footer || {};
+    let width = footer.width || this.width;
+    let height = footer.height || 5;
+    let speed = footer.speed || 2;
     this.footer = new Footer(this, width, height, speed);
   },
 
   initBranch: function() {
-    var branchs = this.opt.branch || [];
+    let branchs = this.opt.branch || [];
     this.branchs = [];
     this.addBranchs(branchs);
   },
 
   initBloom: function() {
-    var bloom = this.opt.bloom || {};
-    var cache = [],
+    let bloom = this.opt.bloom || {};
+    let cache = [],
       num = bloom.num || 500,
       width = bloom.width || this.width,
       height = bloom.height || this.height,
-      figure = this.seed.heart.figure;
+      figure = this.seed.heart.figure,
+      scale = bloom.scale || 1;
     // eslint-disable-next-line no-unused-vars
-    var r = 240;
-    for (var i = 0; i < num; i++) {
-      cache.push(this.createBloom(width, height, r, figure));
+    let r = 240;
+    for (let i = 0; i < num; i++) {
+      cache.push(
+        this.createBloom(
+          width,
+          height,
+          r,
+          figure,
+          null,
+          null,
+          null,
+          scale,
+          null,
+          null
+        )
+      );
     }
     this.blooms = [];
     this.bloomsCache = cache;
@@ -299,13 +340,13 @@ Tree.prototype = {
   },
 
   draw: function(k) {
-    var s = this,
+    let s = this,
       ctx = s.ctx;
-    var rec = s.record[k];
+    let rec = s.record[k];
     if (!rec) {
       return;
     }
-    var point = rec.point,
+    let point = rec.point,
       image = rec.image;
 
     ctx.save();
@@ -318,7 +359,7 @@ Tree.prototype = {
   },
 
   addBranchs: function(branchs) {
-    var s = this,
+    let s = this,
       b,
       p1,
       p2,
@@ -326,7 +367,7 @@ Tree.prototype = {
       r,
       l,
       c;
-    for (var i = 0; i < branchs.length; i++) {
+    for (let i = 0; i < branchs.length; i++) {
       b = branchs[i];
       p1 = new Point(b[0], b[1]);
       p2 = new Point(b[2], b[3]);
@@ -339,8 +380,8 @@ Tree.prototype = {
   },
 
   removeBranch: function(branch) {
-    var branchs = this.branchs;
-    for (var i = 0; i < branchs.length; i++) {
+    let branchs = this.branchs;
+    for (let i = 0; i < branchs.length; i++) {
       if (branchs[i] === branch) {
         branchs.splice(i, 1);
       }
@@ -351,9 +392,9 @@ Tree.prototype = {
     return !!this.branchs.length;
   },
   grow: function() {
-    var branchs = this.branchs;
-    for (var i = 0; i < branchs.length; i++) {
-      var branch = branchs[i];
+    let branchs = this.branchs;
+    for (let i = 0; i < branchs.length; i++) {
+      let branch = branchs[i];
       if (branch) {
         branch.grow();
       }
@@ -365,8 +406,8 @@ Tree.prototype = {
   },
 
   removeBloom: function(bloom) {
-    var blooms = this.blooms;
-    for (var i = 0; i < blooms.length; i++) {
+    let blooms = this.blooms;
+    for (let i = 0; i < blooms.length; i++) {
       if (blooms[i] === bloom) {
         blooms.splice(i, 1);
       }
@@ -385,7 +426,7 @@ Tree.prototype = {
     place,
     speed
   ) {
-    var x, y;
+    let x, y;
     /*eslint no-constant-condition: ["error", { "checkLoops": false }]*/
     while (true) {
       x = random(20, width - 20);
@@ -410,20 +451,20 @@ Tree.prototype = {
     return !!this.blooms.length;
   },
   flower: function(num) {
-    var s = this,
+    let s = this,
       blooms = s.bloomsCache.splice(0, num);
-    for (var i = 0; i < blooms.length; i++) {
+    for (let i = 0; i < blooms.length; i++) {
       s.addBloom(blooms[i]);
     }
     blooms = s.blooms;
-    for (var j = 0; j < blooms.length; j++) {
+    for (let j = 0; j < blooms.length; j++) {
       blooms[j].flower();
     }
   },
 
   snapshot: function(k, x, y, width, height) {
-    var ctx = this.ctx;
-    var image = ctx.getImageData(x, y, width, height);
+    let ctx = this.ctx;
+    let image = ctx.getImageData(x, y, width, height);
     this.record[k] = {
       image: image,
       point: new Point(x, y),
@@ -435,10 +476,10 @@ Tree.prototype = {
     this.record[k || "move"].speed = speed;
   },
   move: function(k, x, y) {
-    var s = this,
+    let s = this,
       ctx = s.ctx;
-    var rec = s.record[k || "move"];
-    var point = rec.point,
+    let rec = s.record[k || "move"];
+    let point = rec.point,
       image = rec.image,
       speed = rec.speed || 10,
       width = rec.width,
@@ -462,22 +503,22 @@ Tree.prototype = {
   },
 
   jump: function() {
-    var s = this,
+    let s = this,
       blooms = s.blooms;
     if (blooms.length) {
-      for (var i = 0; i < blooms.length; i++) {
+      for (let i = 0; i < blooms.length; i++) {
         blooms[i].jump();
       }
     }
     if ((blooms.length && blooms.length < 3) || !blooms.length) {
-      var bloom = this.opt.bloom || {},
+      let bloom = this.opt.bloom || {},
         width = bloom.width || this.width,
         height = bloom.height || this.height,
         figure = this.seed.heart.figure;
       // eslint-disable-next-line no-unused-vars
-      var r = 240;
+      let r = 240;
       // eslint-disable-next-line no-redeclare
-      for (var i = 0; i < random(1, 2); i++) {
+      for (let i = 0; i < random(1, 2); i++) {
         blooms.push(
           this.createBloom(
             width / 2 + width,
@@ -487,7 +528,7 @@ Tree.prototype = {
             null,
             1,
             null,
-            1,
+            bloom.scale,
             new Point(random(-100, 600), 720),
             random(200, 300)
           )
@@ -511,7 +552,7 @@ let Branch = function(tree, point1, point2, point3, radius, length, branchs) {
 
 Branch.prototype = {
   grow: function() {
-    var s = this,
+    let s = this,
       p;
     if (s.len <= s.length) {
       p = bezier([s.point1, s.point2, s.point3], s.len * s.t);
@@ -524,8 +565,8 @@ Branch.prototype = {
     }
   },
   draw: function(p) {
-    var s = this;
-    var ctx = s.tree.ctx;
+    let s = this;
+    let ctx = s.tree.ctx;
     ctx.save();
     ctx.beginPath();
     ctx.fillStyle = "rgb(35, 31, 32)";
@@ -567,7 +608,7 @@ Bloom.prototype = {
     this.figure = figure;
   },
   flower: function() {
-    var s = this;
+    let s = this;
     s.draw();
     s.scale += 0.1;
     if (s.scale > 1) {
@@ -575,7 +616,7 @@ Bloom.prototype = {
     }
   },
   draw: function() {
-    var s = this,
+    let s = this,
       ctx = s.tree.ctx,
       figure = s.figure;
 
@@ -587,8 +628,8 @@ Bloom.prototype = {
     ctx.rotate(s.angle);
     ctx.beginPath();
     ctx.moveTo(0, 0);
-    for (var i = 0; i < figure.length; i++) {
-      var p = figure.get(i);
+    for (let i = 0; i < figure.length; i++) {
+      let p = figure.get(i);
       ctx.lineTo(p.x, -p.y);
     }
     ctx.closePath();
@@ -596,7 +637,7 @@ Bloom.prototype = {
     ctx.restore();
   },
   jump: function() {
-    var s = this,
+    let s = this,
       height = s.tree.height;
 
     if (s.point.x < -20 || s.point.y > height + 20) {
